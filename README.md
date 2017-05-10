@@ -5,9 +5,8 @@
 
 Reference publication:
 
-'''
 [Simone Zaccaria, Mohammed El-Kebir, Gunnar W. Klau, Benjamin J. Raphael: The Copy-Number Tree Mixture Deconvolution Problem and Applications to Multi-sample Bulk Sequencing Tumor Data. RECOMB 2017: 318-335](https://link.springer.com/chapter/10.1007/978-3-319-56970-3_20)
-'''
+
 
 For any question or help with this tool or its usage, please contact one of the following:
   - Simone Zaccaria:  zaccaria  [at]  princeton  [dot]  edu
@@ -15,9 +14,9 @@ For any question or help with this tool or its usage, please contact one of the 
 
 ## Contents
 
-	1. [Dependencies](#dep)
-	2. [Compilation instructions](#comp)
-	3. [Usage instructions](#usage)
+  1. [Dependencies](#dep)
+  2. [Compilation instructions](#comp)
+  3. [Usage instructions](#usage)
   4. [Available data](#data)
 	5. [Details on implementation and structure](#imp)
 
@@ -84,51 +83,51 @@ The first line must be `#PARAMS`. The three subsequent lines indicate the number
 
 Example:
 
-  #PARAMS
-  2 #number of chromosomes
-  3 #number of leaves
-  6 6 #number of segments for each chromosome
-  #PROFILES
-  0 : 2 2 2 2 2 2 | 2 2 2 2 2 2
-  1 : 1 1 1 3 2 2 | 3 3 3 2 2 2
-  2 : 1 2 2 1 2 2 | 1 0 0 1 2 2
-  3 : 0 0 0 3 2 2 | 4 4 4 2 2 2
-  4 : 3 2 2 4 2 2 | 3 3 4 2 2 1
-  #EDGES
-  0 -> 2
-  0 -> 1
-  1 -> 3
-  1 -> 4
-  #EVENTS
-  0 0 1 0 2 -1
-  0 0 1 3 3 1
-  0 0 2 0 3 -1
-  0 0 2 1 2 1
-  0 1 3 0 4 -1
-  0 1 3 2 4 1
-  0 1 4 0 0 1
-  0 1 4 0 3 1
-  1 0 1 0 1 1
-  1 0 1 2 2 1
-  1 0 2 0 2 -1
-  1 0 2 1 3 -1
-  1 1 3 0 2 1
-  1 1 4 2 4 1
-  1 1 4 3 5 -1
-  #MIX-PARAMS
-  2 #number of chromosomes
-  4 #number of samples
-  6 6 #number of segments for each chromosome
-  #PROPORTIONS
-  0.0 0.29 0.71
-  1.0 0.0 0.0
-  0.05 0.0 0.95
-  0.72 0.0 0.28
-	#SAMPLES
-	1 : 2.14 1.43 1.43 3.71 2.0 2.0 | 3.29 3.29 4.0 2.0 2.0 1.29
-	2 : 1.0 2.0 2.0 1.0 2.0 2.0 | 1.0 0.0 0.0 1.0 2.0 2.0
-	3 : 2.9 2.0 2.0 3.85 2.0 2.0 | 2.9 2.85 3.8 1.95 2.0 1.05
-	4 : 1.55 1.99 1.99 1.83 2.0 2.0 | 1.56 0.84 1.11 1.28 2.0 1.72
+    #PARAMS
+    2 #number of chromosomes
+    3 #number of leaves
+    6 6 #number of segments for each chromosome
+    #PROFILES
+    0 : 2 2 2 2 2 2 | 2 2 2 2 2 2
+    1 : 1 1 1 3 2 2 | 3 3 3 2 2 2
+    2 : 1 2 2 1 2 2 | 1 0 0 1 2 2
+    3 : 0 0 0 3 2 2 | 4 4 4 2 2 2
+    4 : 3 2 2 4 2 2 | 3 3 4 2 2 1
+    #EDGES
+    0 -> 2
+    0 -> 1
+    1 -> 3
+    1 -> 4
+    #EVENTS
+    0 0 1 0 2 -1
+    0 0 1 3 3 1
+    0 0 2 0 3 -1
+    0 0 2 1 2 1
+    0 1 3 0 4 -1
+    0 1 3 2 4 1
+    0 1 4 0 0 1
+    0 1 4 0 3 1
+    1 0 1 0 1 1
+    1 0 1 2 2 1
+    1 0 2 0 2 -1
+    1 0 2 1 3 -1
+    1 1 3 0 2 1
+    1 1 4 2 4 1
+    1 1 4 3 5 -1
+    #MIX-PARAMS
+    2 #number of chromosomes
+    4 #number of samples
+    6 6 #number of segments for each chromosome
+    #PROPORTIONS
+    0.0 0.29 0.71
+    1.0 0.0 0.0
+    0.05 0.0 0.95
+    0.72 0.0 0.28
+	  #SAMPLES
+	  1 : 2.14 1.43 1.43 3.71 2.0 2.0 | 3.29 3.29 4.0 2.0 2.0 1.29
+	  2 : 1.0 2.0 2.0 1.0 2.0 2.0 | 1.0 0.0 0.0 1.0 2.0 2.0
+	  3 : 2.9 2.0 2.0 3.85 2.0 2.0 | 2.9 2.85 3.8 1.95 2.0 1.05
+	  4 : 1.55 1.99 1.99 1.83 2.0 2.0 | 1.56 0.84 1.11 1.28 2.0 1.72
 
 The first line is `#PARAMS`. The three subsequent lines indicate the number of chromosomes, the number *k* of leaves that have been inferred and the number of segments for each chromosome (separated by a space). The fourth line is `#PROFILES`. Then, for each node corresponding to a clone in the copy number tree, the copy number profile is given, such that the chromosomes are separated by the symbol `|` and the copy numbers on each chromosome are separated by spaces. Each clone is uniquely identified by a number at the beginning of the line and the copy number profile strarts after `:`. The *k* leaves, corresponding to the *k* extant clones that we inferred, correspond to the last *k* clones. The next line is `#EDGES`. Each subsequent line corresponds to an edge of the tree that is given in the form `i -> j` such that the edge goes from the clone labeled as `i` to the clone labeled as `j`. The next line is `#EVENTS`. Each subsquent line corresponds to an interval event that is given in the form of `c i j s t` such that `c` corresponds to the chromosome that is affected by the interval event, `(i, j)` identify the edge labeled by the corresponding event, and `(s, t)` define the starting and ending positions of the interval event (both are included, and note that positions are labeled starting from 0). The remaining lines correspond to the input, described in the previous section.
 
