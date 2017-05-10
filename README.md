@@ -144,7 +144,7 @@ To visualize the resulting copy-number tree:
     ./visualize result.txt > T.dot
     dot -Tpdf T.dot -o T.pdf
 
-*Suggestions:*
+### Suggestions on usage
 
 1. The real actual running time strongly depends on the complexity of the input. To choose the best value for the time limit `-s` that allows to minimize the needed running time and obtain the best performance, we suggest the user to test the input instance with an increasing time limit `-s` (using for example an interval of length 1, i.e. `-Z 100` and `-lbZ 100`) and to analyze how the objective function varies. More careful analysis can be done by considering the gap of the ILP formulation using and higher level of verbosity `-v 4` that measures how far the provided solution is from the optimum. The performance of the method highly benefits from an execution on multiple machines. We can achieve this solution by running different starting points on different machines with the same parameters and different random seeds `-ss` or the interval *[L, R]* where to search Lmabda_max can be split into different machines.
 
@@ -231,6 +231,8 @@ This tool is used to compare to outputs following the metric used in the referen
 
 ## <a name="data"></a>Available data
 
+### Simulated data
+
 In this table we describe the simulated datasets that are made available in this own repository together with the source of the method.
 
 Dataset           | Location of Input          | True Solutions            | DESCRIPTION
@@ -238,6 +240,8 @@ Dataset           | Location of Input          | True Solutions            | DES
 `1chr`            | data/sim/1chr-input        | data/sim/1chr-input       | Simulated dataset containing instances composed of a single chromosome, 20 segments per chromosome, varying true number of unknown leaves in {4,6,8} (identified by the corresponding labels in the file name {k4,k6,k8}), and varying number of samples in {2,5,10} (identified by the corresponding labels in the filename {m2,m5,m10})
 `4chr`            | data/sim/4chr-input        | data/sim/4chr-input       | Simulated dataset containing instances composed of 4 chromosomes, 20 segments per chromosome, varying true number of unknown leaves in {4,6,8} (identified by the corresponding labels in the file name {k4,k6,k8}), and varying number of samples in {2,5,10} (identified by the corresponding labels in the filename {m2,m5,m10})
 `full-genome`     | data/sim/full-genome-input | data/sim/full-genome-true | Simulated full-genome dataset containing instances composed of 22 chromosomes, varying number of segments in the chromosomes that reflect the length distribution of the prostate-cancer dataset presented in (Gundem et al., Nature, 2015), true number of leaves equal to 4, and varying number of samples in {2,5,10} (identified by the corresponding labels in the filename {m2,m5,m10}), and randomly generated with different random seeds identified by the following labels in the file name {ss11,ss12,ss13}.
+
+### Real data
 
 Moreover, in `data/real/gundem2015` we make available the input instances that we obtain from 4 patients `{A10, A22, A29, A31}` of the prostate-cancer dataset published in (Gundem et al., Nature, 2015). We obtain the instances by processing the fractional copy numbers in these datasets (that the authors obtained by using the Battenberg tool) and we project the segments on all the samples, such that each sample is defined over the same set of segments. Moreover, we clean the instances by removing outlying segments that are too short or have a unlikely-high fractional copy number. The corresponding instances are available in the following files {`A10-cleaned.samples`, `A22-cleaned.samples`, `A29-cleaned.samples`, `A31-cleaned.samples`} and these other files {`A10-resulting-starts-ends.segments`, `A22-resulting-starts-ends.segments`, `A29-resulting-starts-ends.segments`, `A31-resulting-starts-ends.segments`} contain the starting position (first line) and the ending positions (second line) of each resulting segment.
 
