@@ -8,7 +8,7 @@ Reference publication:
 [Simone Zaccaria, Mohammed El-Kebir, Gunnar W. Klau, Benjamin J. Raphael: The Copy-Number Tree Mixture Deconvolution Problem and Applications to Multi-sample Bulk Sequencing Tumor Data. RECOMB 2017: 318-335](https://link.springer.com/chapter/10.1007/978-3-319-56970-3_20)
 
 
-For any question or help with this tool or its usage, please contact one of the following:
+For any questions regarding this tool or its usage, please contact:
   - Simone Zaccaria:  zaccaria  [at]  princeton  [dot]  edu
   - Mohammed El-Kebir:  melkebir  [at]  princeton  [dot]  edu
 
@@ -18,7 +18,7 @@ For any question or help with this tool or its usage, please contact one of the 
   2. [Compilation instructions](#comp)
   3. [Usage instructions](#usage)
   4. [Available data](#data)
-	5. [Details on implementation and structure](#imp)
+	5. [Implementation details](#imp)
 
 ## <a name="dep"></a>Dependencies
 
@@ -29,7 +29,7 @@ For any question or help with this tool or its usage, please contact one of the 
 
 ## <a name="comp"></a>Compilation instructions
 
-To compile `CNT`, execute the following commands from the root of the repository:
+To compile `CNT-MD`, execute the following commands from the root of the repository:
 
     mkdir build
     cd build
@@ -51,14 +51,13 @@ In case CMake fails to detect either CPLEX or LEMON, run the following command w
 	-DCONCERT_LIB_DIR=~/ILOG/concert/lib/x86-64_osx/static_pic \
 	-DCONCERT_INC_DIR=~/ILOG/concert/include/ ..
 	
-or use the tool ccmake to set the same corresponding paths.
+or use the tool `ccmake` to set the same corresponding paths.
 
-The compilation results in the following executables in `build` directory:
+The compilation results in the following executables in the `build` directory:
 
-* `cnt`
+* `mixcnp`
 * `visualize`
 * `compare`
-
 
 ## <a name="usage"></a>Usage instructions
 
@@ -76,8 +75,8 @@ Example:
 	3 : 2.9 2.0 2.0 3.85 2.0 2.0 | 2.9 2.85 3.8 1.95 2.0 1.05
 	4 : 1.55 1.99 1.99 1.83 2.0 2.0 | 1.56 0.84 1.11 1.28 2.0 1.72
 
-The first line must be `#PARAMS`. The three subsequent lines indicate the number of chromosomes, the number *m* of samples and the number of segments for each chromosome (separated by a space). The fourth line must be `#SAMPLES`. Then for each sample the fractional copy numbers are given, such that the fractions in the same chromosome are separated by spaces, instead the chromosomes are sperated by '|'.
-*NOTE!!* Each sample must be defined over the same set of segments for each chromosome. Therefore if the fractional copy numbers have been called independetly for each sample, a procedure is needed to project the same breakpoints on all the samples and obtain samples defined over the same set of genomic segments.
+The first line must be `#PARAMS`. The three subsequent lines indicate the number of chromosomes, the number of samples and the number of segments for each chromosome (separated by a space character). The fourth line must be `#SAMPLES`. Next, for each sample the fractional copy numbers are given, such that the fractions of segments on the same chromosome are separated by spaces, whereas the chromosomes are separated by '|'.
+*IMPORTANT:* Each sample must contain the same set of segments per chromosome. Therefore if the fractional copy numbers have been called independently for each sample, a procedure is needed to ensure this.
 
 ### Output format
 
@@ -123,28 +122,43 @@ Example:
     1.0 0.0 0.0
     0.05 0.0 0.95
     0.72 0.0 0.28
-	  #SAMPLES
-	  1 : 2.14 1.43 1.43 3.71 2.0 2.0 | 3.29 3.29 4.0 2.0 2.0 1.29
-	  2 : 1.0 2.0 2.0 1.0 2.0 2.0 | 1.0 0.0 0.0 1.0 2.0 2.0
-	  3 : 2.9 2.0 2.0 3.85 2.0 2.0 | 2.9 2.85 3.8 1.95 2.0 1.05
-	  4 : 1.55 1.99 1.99 1.83 2.0 2.0 | 1.56 0.84 1.11 1.28 2.0 1.72
+    #SAMPLES
+    1 : 2.14 1.43 1.43 3.71 2.0 2.0 | 3.29 3.29 4.0 2.0 2.0 1.29
+    2 : 1.0 2.0 2.0 1.0 2.0 2.0 | 1.0 0.0 0.0 1.0 2.0 2.0
+    3 : 2.9 2.0 2.0 3.85 2.0 2.0 | 2.9 2.85 3.8 1.95 2.0 1.05
+    4 : 1.55 1.99 1.99 1.83 2.0 2.0 | 1.56 0.84 1.11 1.28 2.0 1.72
 
-The first line is `#PARAMS`. The three subsequent lines indicate the number of chromosomes, the number *k* of leaves that have been inferred and the number of segments for each chromosome (separated by a space). The fourth line is `#PROFILES`. Then, for each node corresponding to a clone in the copy number tree, the copy number profile is given, such that the chromosomes are separated by the symbol `|` and the copy numbers on each chromosome are separated by spaces. Each clone is uniquely identified by a number at the beginning of the line and the copy number profile strarts after `:`. The *k* leaves, corresponding to the *k* extant clones that we inferred, correspond to the last *k* clones. The next line is `#EDGES`. Each subsequent line corresponds to an edge of the tree that is given in the form `i -> j` such that the edge goes from the clone labeled as `i` to the clone labeled as `j`. The next line is `#EVENTS`. Each subsquent line corresponds to an interval event that is given in the form of `c i j s t` such that `c` corresponds to the chromosome that is affected by the interval event, `(i, j)` identify the edge labeled by the corresponding event, and `(s, t)` define the starting and ending positions of the interval event (both are included, and note that positions are labeled starting from 0). The remaining lines correspond to the input, described in the previous section.
+The first line is `#PARAMS`. 
+The three subsequent lines indicate the number of chromosomes, the number *k* of leaves that have been inferred and the number of segments for each chromosome (separated by a space). 
+The fourth line is `#PROFILES`. 
+Next, for each node corresponding to a clone in the copy number tree, the copy number profile is given, such that the chromosomes are separated by the symbol `|` and the copy numbers on each chromosome are separated by spaces. 
+Each clone is uniquely identified by a number at the beginning of the line followed by the copy number profile after `:`. 
+The *k* leaves, corresponding to the *k* extant clones that we inferred, correspond to the last *k* clones. 
+The next line is `#EDGES`.
+Each subsequent line corresponds to an edge of the tree that is given in the form `i -> j` such that the edge goes from the clone with id `i` to the clone with id `j`. 
+The next line is `#EVENTS`. 
+Each subsequent line corresponds to an interval event that is given in the form of `c i j s t`, where `c` is the chromosome that is affected by the interval event, `(i, j)` identifies the edge labeled by the corresponding event, and `(s, t)` define the start and end positions of the interval event (both bounds are inclusive, and are 0-based). The remaining lines replicate the provided input instance, described in the previous section.
 
-### Example of execution
+### Example execution
 
 To run `mixcnp`:
 
 	./mixcnp input.samples -Z 120 -d -j 2 -k 3 -m 4000 -ni 5 -ns 50 -nt 2 -o result.out -s 120 -t 0.001 -ss 12 &> log
 
-`input.samples` is the file containing the input samples in the input format. The rightmost bound *Z* is set to 120 using `-Z` and `-lbZ` is left to the default value of 0, therefore the best value of Lambda_max is searched in the interval *[0, 120]*. The option `-d` is used to force the presence of the normal diploid clone, and this is indeed needed to study the normal admixture. Looking at the following parameters `-j 2 -ni 5 -ns 50 -s 600` we can estimate an upper bound to the total running time: There are 2 workers running in parallel and each of those will consider 25 starting points over the total of 100 as from `-ns 100` (since starting points are considered independently). The upper bound to the running time of each starting point is 600 seconds (`-s`) for solving each C-step (note that U-step does not typically affect the total running time) and a number of steps up to 5 (`-ni`) is repeated iteratively. Hence, the running time from each starting point is equal at most to `*120*5 sec = 600 sec = 10 min` and the execution for all the starting points will last for up to `25*10 min = 250 min = 4,2 hr`. Moreover, the size of the interval for Lambda_max is 100 (`-Z 100` and `-lbZ` left to default 0) and the number of iteration of the searching scheme is logarithmic, i.e. approximately equal to `7-8`, since we are using the default binary search. Therefore the entire procedure will be executed for at most `8*4,2 hr = 34 hr` (using a higher number of workers equal to 10 on a server already help to have a maximum expected running time of 7 hr). Since the number of threads of each worker is set to 2, a total of 4 cores will be used on the same machines and they must be available to guarantee the expected running time. Furthermore, each worker can used at most 4 GB (`-m`) and this guarantees that the memory of the machine will not be exhausted by using a total of `2*4 GB = 8 GB`. The threshold value `-t 0.001` means that a difference between each observed fractional copy number and the result is tolerated up to 0.001 (below that threshold, drops in the objective are not considered as an improvement). The parameter `-ss 12` determines the random seed that will be used and this is important for replicating the execution. Lastly, the final result will be written in the output file `result.out` and the log is written by redirection in the file `log`.
+`input.samples` is the file containing the input samples in the input format. 
+The rightmost bound *Z* is set to 120 using `-Z` and `-lbZ` is left to the default value of 0, therefore the best value of Lambda_max is searched for in the interval *[0, 120]*. 
+The option `-d` is used to force the presence of the normal diploid clone, and this is indeed needed to study the normal admixture. 
+Given parameters `-j 2 -ni 5 -ns 50 -s 600`, we can estimate an upper bound on the total running time.
+There are 2 workers (`-j 2`) running in parallel and each of these will on roughly half of the total number of 50 starting points (`-ns 50`). 
+The upper bound of the running time of each starting point is 600 seconds (`-s`) for solving each C-step (note that U-step typically does not affect the total running time) and a number of steps up to 5 (`-ni`) is repeated iteratively. 
+Hence, the running time from each starting point is equal at most to `*120*5 sec = 600 sec = 10 min` and the execution for all the starting points will last for up to `25*10 min = 250 min = 4,2 hr`. Moreover, the size of the interval for Lambda_max is 100 (`-Z 100` and `-lbZ` left to default 0) and the number of iteration of the searching scheme is logarithmic, i.e. approximately equal to `7-8`, since we are using the default binary search. Therefore the entire procedure will be executed for at most `8*4,2 hr = 34 hr` (using a higher number of workers equal to 10 on a server already help to have a maximum expected running time of 7 hr). Since the number of threads of each worker is set to 2, a total of 4 cores will be used on the same machines and they must be available to guarantee the expected running time. Furthermore, each worker can used at most 4 GB (`-m`) and this guarantees that the memory of the machine will not be exhausted by using a total of `2*4 GB = 8 GB`. The threshold value `-t 0.001` means that a difference between each observed fractional copy number and the result is tolerated up to 0.001 (below that threshold, drops in the objective are not considered as an improvement). The parameter `-ss 12` determines the random seed that will be used and this is important for replicating the execution. Lastly, the final result will be written in the output file `result.out` and the log is written by redirection in the file `log`.
 
 To visualize the resulting copy-number tree:
 
     ./visualize result.txt > T.dot
     dot -Tpdf T.dot -o T.pdf
 
-### Suggestions on usage
+### Usage suggestions
 
 1. The real actual running time strongly depends on the complexity of the input. To choose the best value for the time limit `-s` that allows to minimize the needed running time and obtain the best performance, we suggest the user to test the input instance with an increasing time limit `-s` (using for example an interval of length 1, i.e. `-Z 100` and `-lbZ 100`) and to analyze how the objective function varies. More careful analysis can be done by considering the gap of the ILP formulation using and higher level of verbosity `-v 4` that measures how far the provided solution is from the optimum. The performance of the method highly benefits from an execution on multiple machines. We can achieve this solution by running different starting points on different machines with the same parameters and different random seeds `-ss` or the interval *[L, R]* where to search Lmabda_max can be split into different machines.
 
