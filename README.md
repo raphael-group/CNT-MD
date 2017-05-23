@@ -24,6 +24,7 @@ For any questions regarding this tool or its usage, please contact:
 
 * [LEMON Graph library](http://lemon.cs.elte.hu) (>= 1.3)
 * [ILOG CPLEX](http://www.ibm.com/developerworks/downloads/ws/ilogcplex/) (>= 12.0)
+* Boost libraries
 
 [Graphviz](http://www.graphviz.org) is required to visualize the resulting DOT files, but is not required for compilation.
 
@@ -149,9 +150,16 @@ To run `mixcnp`:
 The rightmost bound *Z* is set to 120 using `-Z` and `-lbZ` is left to the default value of 0, therefore the best value of Lambda_max is searched for in the interval *[0, 120]*. 
 The option `-d` is used to force the presence of the normal diploid clone, and this is indeed needed to study the normal admixture. 
 Given parameters `-j 2 -ni 5 -ns 50 -s 600`, we can estimate an upper bound on the total running time.
-There are 2 workers (`-j 2`) running in parallel and each of these will on roughly half of the total number of 50 starting points (`-ns 50`). 
-The upper bound of the running time of each starting point is 600 seconds (`-s`) for solving each C-step (note that U-step typically does not affect the total running time) and a number of steps up to 5 (`-ni`) is repeated iteratively. 
-Hence, the running time from each starting point is equal at most to `*120*5 sec = 600 sec = 10 min` and the execution for all the starting points will last for up to `25*10 min = 250 min = 4,2 hr`. Moreover, the size of the interval for Lambda_max is 100 (`-Z 100` and `-lbZ` left to default 0) and the number of iteration of the searching scheme is logarithmic, i.e. approximately equal to `7-8`, since we are using the default binary search. Therefore the entire procedure will be executed for at most `8*4,2 hr = 34 hr` (using a higher number of workers equal to 10 on a server already help to have a maximum expected running time of 7 hr). Since the number of threads of each worker is set to 2, a total of 4 cores will be used on the same machines and they must be available to guarantee the expected running time. Furthermore, each worker can used at most 4 GB (`-m`) and this guarantees that the memory of the machine will not be exhausted by using a total of `2*4 GB = 8 GB`. The threshold value `-t 0.001` means that a difference between each observed fractional copy number and the result is tolerated up to 0.001 (below that threshold, drops in the objective are not considered as an improvement). The parameter `-ss 12` determines the random seed that will be used and this is important for replicating the execution. Lastly, the final result will be written in the output file `result.out` and the log is written by redirection in the file `log`.
+There are 2 workers (`-j 2`) running in parallel and each of these will run roughly half of the total number of 50 starting points (`-ns 50`). 
+Our method runs an iterative procedure composed of at most 5 steps (`-ni 5`) for each starting point.
+Each step of the iterative procedure is composed of two steps: a C-step and a U-step. such that the parameter `-s 600` specifies the time limit for each step of each iteration.
+The U-step typically does not affect the total running time.
+While, the parameter `-s 120` specifies the time limit 120 in terms of seconds for each C-step.
+Hence, the running time from each starting point is at most of `*120*5 sec = 600 sec = 10 min`.
+As such, the execution of all the starting points will last for up to `25*10 min = 250 min = 4,2 hr` since each worker runs 25 starting points.
+Moreover, the size of the interval for Lambda_max is 100 (`-Z 100` and `-lbZ` left to default 0) and the number of iteration of the searching scheme is logarithmic, i.e. approximately 8 iterations, since we are using the default binary search.
+Therefore the main algorithm will be repeated by the seatchin scheme for 8 times and the entire procedure will be executed for at most `8*4,2 hr = 34 hr` (using a higher number of workers equal to 10 we can already improve to the expected total running time to 7 hr). Since the number of threads of each worker is set to 2, a total of 4 cores will be used on the same machines and they must be available to guarantee the expected running time. Furthermore, each worker can use at most 4 GB (`-m`) and this guarantees that the memory of the machine will not be exhausted by using a total of `2*4 GB = 8 GB`.
+The threshold value `-t 0.001` means that a difference between each observed fractional copy number and the result is tolerated up to 0.001 (below that threshold, drops in the objective are not considered as an improvement). The parameter `-ss 12` determines the random seed that will be used and this is important for replicating the execution. Lastly, the final result will be written in the output file `result.out` and the log is written by redirection in the file `log`.
 
 To visualize the resulting copy-number tree:
 
