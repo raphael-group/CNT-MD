@@ -43,6 +43,15 @@ Note: On Mac OS >= 10.9, you have to ensure that LEMON is linked against the old
 	  set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libstdc++ " )
 	endif()
     
+Also, if you are using CPLEX < 12.7 you must uncomment the following lines in the CMakeLists.txt of this repository:
+
+      if( ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
+        set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libstdc++" )
+      else()
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+      endif()
+
+Instead, with the most recent versions of CPLEX >= 12.7, you can keep it as it is. 
 In case CMake fails to detect either CPLEX or LEMON, run the following command with adjusted paths:
 
 	cmake \

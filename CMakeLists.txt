@@ -61,15 +61,18 @@ if( NOT CPLEX_INC_DIR OR NOT CPLEX_LIB_DIR OR NOT CONCERT_INC_DIR OR NOT CONCERT
   endif()
 endif()
 
+#UNCOMMENT THIS LINE IF YOU ARE USING A VERSION OF CPLEX < 12.7
+#SET(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY "libstdc++")
 
-SET(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY "libstdc++")
 add_definitions( -DIL_STD )
 
-if( ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
-  set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libstdc++" )
-else()
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-endif()
+#if( ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
+#  set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libstdc++" )
+#else()
+#  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+#endif()
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 include_directories( ${CPLEX_INC_DIR} ${CONCERT_INC_DIR} ${Boost_INCLUDE_DIRS} "${LIBLEMON_ROOT}/include" "src" )
 link_directories( ${CPLEX_LIB_DIR} ${CONCERT_LIB_DIR} ${Boost_LIBRARIES} "${LIBLEMON_ROOT}/lib" )
