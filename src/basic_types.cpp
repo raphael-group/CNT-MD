@@ -2,7 +2,7 @@
 
 lemon::Tolerance<double> g_tol(1e-4);
 
-boost::mt19937 g_rng;
+std::mt19937 g_rng;
 
 VerbosityLevel g_verbosity;
 

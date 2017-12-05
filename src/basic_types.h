@@ -11,8 +11,7 @@
 #include <algorithm>
 #include <stdexcept>
 #include <lemon/tolerance.h>
-#include <boost/random.hpp>
-#include <boost/random/mersenne_twister.hpp>
+#include <random>
 #include <boost/thread.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/posix_time/posix_time_io.hpp>
@@ -21,7 +20,7 @@
 extern lemon::Tolerance<double> g_tol;
 
 /// Random number generator
-extern boost::mt19937 g_rng;
+extern std::mt19937 g_rng;
 
 extern boost::mutex g_mutex;
 

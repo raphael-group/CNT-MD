@@ -228,12 +228,10 @@ DoubleMatrix Manager::build_random_M(const int num_samples, const int num_leaves
 
     for(unsigned int p = 0; p < num_samples; ++p)
     {
-        //std::uniform_int_distribution<int> uni(1, num_leaves);
-        boost::uniform_int<> dist(1, num_leaves);
-        boost::variate_generator<boost::mt19937&, boost::uniform_int<> > generator(g_rng, dist);
+        std::uniform_int_distribution<int> uni(1, num_leaves);
 
         //const int num_parts = generator();
-        const int num_parts = std::max(generator(), generator());
+        const int num_parts = std::max(uni(g_rng), uni(g_rng));
         result.push_back(build_partition_vector(num_leaves, num_parts, size_bubbles));
     }
 
@@ -248,13 +246,12 @@ DoubleArray Manager::build_partition_vector(const int num_leaves, const int num_
     std::shuffle(positions.begin(), positions.end(), g_rng);
 
     //std::uniform_int_distribution<int> uni(1, size_bubbles);
-    boost::uniform_int<> dist(0, size_bubbles);
-    boost::variate_generator<boost::mt19937&, boost::uniform_int<> > generator(g_rng, dist);
+    std::uniform_int_distribution<> dist(0, size_bubbles);
 
     DoubleArray bubbles;
     for(unsigned int i = 0; i < num_parts-1; ++i)
     {
-        bubbles.push_back((double)generator()/(double)size_bubbles);
+        bubbles.push_back((double)dist(g_rng)/(double)size_bubbles);
     }
     std::sort(bubbles.begin(), bubbles.end());
 

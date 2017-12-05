@@ -63,7 +63,7 @@ int main(int argc, char** argv)
       .refOption("dr", "Deactivate refinement", deactiveRefinement)
       .other("input", "Input file");
     ap.parse();
-    g_rng = boost::mt19937(seed);
+    g_rng = std::mt19937(seed);
     g_verbosity = static_cast<VerbosityLevel>(verbosityLevel);
 
     if (ap.files().size() == 0)
