@@ -7,10 +7,10 @@ Reference publication:
 
 [Simone Zaccaria, Mohammed El-Kebir, Gunnar W. Klau, Benjamin J. Raphael: The Copy-Number Tree Mixture Deconvolution Problem and Applications to Multi-sample Bulk Sequencing Tumor Data. RECOMB 2017: 318-335](https://link.springer.com/chapter/10.1007/978-3-319-56970-3_20)
 
-
 For any questions regarding this tool or its usage, please contact:
   - Simone Zaccaria:  zaccaria  [at]  princeton  [dot]  edu
-  - Mohammed El-Kebir:  melkebir  [at]  princeton  [dot]  edu
+
+This software has benn implemented by Simone Zaccaria and Mohammed El-Kebir.
 
 ## Contents
 
@@ -36,19 +36,19 @@ To compile `CNT-MD`, execute the following commands from the root of the reposit
     cd build
     cmake ..
     make
-    
+
 Note: On Mac OS >= 10.9, you have to ensure that LEMON is linked against the old C++ standard library by editing LEMON's `CMakeLists.txt` file as follows.
 
 	if( ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
 	  set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libstdc++ " )
 	endif()
-    
+
 Also, if you are using CPLEX < 12.7 on Mac OS you must change the following lines in the CMakeLists.txt of this repository as follow:
 
       #  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
       set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libstdc++" )
 
-Instead, with the most recent versions of CPLEX >= 12.7 and on any other operative system, you can keep it as it is. 
+Instead, with the most recent versions of CPLEX >= 12.7 and on any other operative system, you can keep it as it is.
 In case CMake fails to detect either CPLEX or LEMON, run the following command with adjusted paths:
 
 	cmake \
@@ -57,7 +57,7 @@ In case CMake fails to detect either CPLEX or LEMON, run the following command w
 	-DCPLEX_LIB_DIR=~/ILOG/cplex/lib/x86-64_osx/static_pic \
 	-DCONCERT_LIB_DIR=~/ILOG/concert/lib/x86-64_osx/static_pic \
 	-DCONCERT_INC_DIR=~/ILOG/concert/include/ ..
-	
+
 or use the tool `ccmake` to set the same corresponding paths.
 
 The compilation results in the following executables in the `build` directory:
@@ -67,6 +67,44 @@ The compilation results in the following executables in the `build` directory:
 * `compare`
 
 ## <a name="usage"></a>Usage instructions
+
+### Generate input from log2ratios
+
+We provide a command able to compute the fractional copy numbers of multiple samples and generate the corresponding input from standard log2ratios.
+The following is an example (also reported in `data/test/log2ratios.tsv`) of the required tab-separated file of log2ratios:
+
+    sample chr          start       end        log2_Copyratio
+    CA_1     1              10001    249225000           0.014429
+    CA_1     3              60001    129760000           0.010769
+    CA_1     3              129760001           129805000           -3.377949
+    CA_1     3              129805001           197900000           0.020513
+    CA_2     1              10001    6000001           0.021429
+    CA_2     1              6000001    249225000           0.014429
+    CA_2     3              60001    197900000           0.010769
+
+The first line represents the header and its presence is required, while any other subsequent line corresponds to a segment in a sample.
+The first field corresponds to the sample.
+The second field specifies the chromosome.
+The third and fourth fields indicate the start and end positions of the corresponding segment, respectively.
+Any additional fields may appear after the fourth but the last field must correspond to the log2 read-depth ratios (obtained for example through the GWAS pipeline).
+
+The command `make_input.py` is written in python2.7 and is located in `utils`.
+The command implements a procedure that is similar to the one used by current methods, as ABSOLUTE and Battenberg; as such, this method aims to find the best values of tumor purity and tumor ploidy by assuming that solutions with more clonal CNAs are more likely and by assuming to know the most common total copy number in the genome of tumor cells.
+
+    usage: make_input.py [-h] [-c COPYNUMBER] [-b BINS] [-m MAXIMUMCN] [-u MINIMUMU] INPUT
+
+- `INPUT` the required input is a tab-separated file in the format 'SAMPLE\tCHR\tSTART\tEND\t...\tLOG2RATIO' as described above.
+- `COPYNUMBER` the command also requires to provide the most common total copy number in the genome of tumor cells; this value is typically equal to 2 for diploid tumors that did not undergo whole-genome duplications, and is equal to 4 when a single WGD occurs. The commands does not automatically predicts the presence of a WGD and considers by default a value equal to 2.
+- `BINS` the integer number of bins used to discretize the distribution of log2 read-depth ratios.
+- `MAXMUMCN` the value of the maximum copy number used to fit the log2 ratios.
+- `MINIMUMU` the minimum value of tumor purity (i.e. fraction of tumor cells in each sample) used to it the log2 ratios.
+
+In addition, the command labels each sample with the corresponding name and annotates the commented line `#SAMPLES` with the the mapping of chromosome and segments.
+
+The following is an example of execution using the given example of data:
+
+    python2 make_input.py ../data/test/log2ratios.tsv -c 2 -b 30 -m 8 -u 0.3 > input.samples
+
 
 ### Input format
 
@@ -135,15 +173,15 @@ Example:
     3 : 2.9 2.0 2.0 3.85 2.0 2.0 | 2.9 2.85 3.8 1.95 2.0 1.05
     4 : 1.55 1.99 1.99 1.83 2.0 2.0 | 1.56 0.84 1.11 1.28 2.0 1.72
 
-The first line is `#PARAMS`. 
-The three subsequent lines indicate the number of chromosomes, the number *k* of leaves that have been inferred and the number of segments for each chromosome (separated by a space). 
-The fourth line is `#PROFILES`. 
-Next, for each node corresponding to a clone in the copy number tree, the copy number profile is given, such that the chromosomes are separated by the symbol `|` and the copy numbers on each chromosome are separated by spaces. 
-Each clone is uniquely identified by a number at the beginning of the line followed by the copy number profile after `:`. 
-The *k* leaves, corresponding to the *k* extant clones that we inferred, correspond to the last *k* clones. 
+The first line is `#PARAMS`.
+The three subsequent lines indicate the number of chromosomes, the number *k* of leaves that have been inferred and the number of segments for each chromosome (separated by a space).
+The fourth line is `#PROFILES`.
+Next, for each node corresponding to a clone in the copy number tree, the copy number profile is given, such that the chromosomes are separated by the symbol `|` and the copy numbers on each chromosome are separated by spaces.
+Each clone is uniquely identified by a number at the beginning of the line followed by the copy number profile after `:`.
+The *k* leaves, corresponding to the *k* extant clones that we inferred, correspond to the last *k* clones.
 The next line is `#EDGES`.
-Each subsequent line corresponds to an edge of the tree that is given in the form `i -> j` such that the edge goes from the clone with id `i` to the clone with id `j`. 
-The next line is `#EVENTS`. 
+Each subsequent line corresponds to an edge of the tree that is given in the form `i -> j` such that the edge goes from the clone with id `i` to the clone with id `j`.
+The next line is `#EVENTS`.
 Each subsequent line corresponds to an interval event that is given in the form of `c i j s t`, where `c` is the chromosome that is affected by the interval event, `(i, j)` identifies the edge labeled by the corresponding event, and `(s, t)` define the start and end positions of the interval event (both bounds are inclusive, and are 0-based). The remaining lines replicate the provided input instance, described in the previous section.
 
 ### Example execution
@@ -152,11 +190,12 @@ To run `mixcnp`:
 
 	./mixcnp input.samples -Z 120 -d -j 2 -k 3 -m 4000 -ni 5 -ns 50 -nt 2 -o result.out -s 120 -t 0.001 -ss 12 &> log
 
-`input.samples` is the file containing the input samples in the input format. 
-The rightmost bound *Z* is set to 120 using `-Z` and `-lbZ` is left to the default value of 0, therefore the best value of Lambda_max is searched for in the interval *[0, 120]*. 
-The option `-d` is used to force the presence of the normal diploid clone, and this is indeed needed to study the normal admixture. 
+`input.samples` is the file containing the input samples in the input format.
+The rightmost bound *Z* is set to 120 using `-Z` and `-lbZ` is left to the default value of 0, therefore the best value of Lambda_max is searched for in the interval *[0, 120]*.
+The number of leaves is fixed to be equal to 3 through `-k`.
+The option `-d` is used to force the presence of the normal diploid clone, and this is indeed needed to study the normal admixture.
 Given parameters `-j 2 -ni 5 -ns 50 -s 600`, we can estimate an upper bound on the total running time.
-There are 2 workers (`-j 2`) running in parallel and each of these will run roughly half of the total number of 50 starting points (`-ns 50`). 
+There are 2 workers (`-j 2`) running in parallel and each of these will run roughly half of the total number of 50 starting points (`-ns 50`).
 Our method runs an iterative procedure composed of at most 5 steps (`-ni 5`) for each starting point.
 Each step of the iterative procedure is composed of two steps: a C-step and a U-step. such that the parameter `-s 600` specifies the time limit for each step of each iteration.
 The U-step typically does not affect the total running time.
@@ -164,7 +203,7 @@ While, the parameter `-s 120` specifies the time limit 120 in terms of seconds f
 Hence, the running time from each starting point is at most of `*120*5 sec = 600 sec = 10 min`.
 As such, the execution of all the starting points will last for up to `25*10 min = 250 min = 4,2 hr` since each worker runs 25 starting points.
 Moreover, the size of the interval for Lambda_max is 100 (`-Z 100` and `-lbZ` left to default 0) and the number of iteration of the searching scheme is logarithmic, i.e. approximately 8 iterations, since we are using the default binary search.
-Therefore the main algorithm will be repeated by the seatchin scheme for 8 times and the entire procedure will be executed for at most `8*4,2 hr = 34 hr` (using a higher number of workers equal to 10 we can already improve to the expected total running time to 7 hr). Since the number of threads of each worker is set to 2, a total of 4 cores will be used on the same machines and they must be available to guarantee the expected running time. Furthermore, each worker can use at most 4 GB (`-m`) and this guarantees that the memory of the machine will not be exhausted by using a total of `2*4 GB = 8 GB`.
+Therefore the main algorithm will be repeated by the searching scheme for 8 times and the entire procedure will be executed for at most `8*4,2 hr = 34 hr` (using a higher number of workers equal to 10 we can already improve to the expected total running time to 7 hr). Since the number of threads of each worker is set to 2, a total of 4 cores will be used on the same machines and they must be available to guarantee the expected running time. Furthermore, each worker can use at most 4 GB (`-m`) and this guarantees that the memory of the machine will not be exhausted by using a total of `2*4 GB = 8 GB`.
 The threshold value `-t 0.001` means that a difference between each observed fractional copy number and the result is tolerated up to 0.001 (below that threshold, drops in the objective are not considered as an improvement). The parameter `-ss 12` determines the random seed that will be used and this is important for replicating the execution. Lastly, the final result will be written in the output file `result.out` and the log is written by redirection in the file `log`.
 
 To visualize the resulting copy-number tree:
@@ -178,7 +217,7 @@ To visualize the resulting copy-number tree:
 
 2. The same procedure described above can be symmetrically applied to estimate a number of starting points `-ns` and number `-ni` of iterations that are large enough for estimating the value of the objective function.
 
-3. For large instances, we suggest the user to follow a 2-step procedure: In the first step, multiple starting points with different parameters and a running time relatively low can be used to estimate a smaller interval *[L, R]* containing the best value of Lambda_max with a high probability. In the second step, a higher running time and a higher number of starting points can be used to better explore the objective function on the resulting smaller interval *[L, R]*. 
+3. For large instances, we suggest the user to follow a 2-step procedure: In the first step, multiple starting points with different parameters and a running time relatively low can be used to estimate a smaller interval *[L, R]* containing the best value of Lambda_max with a high probability. In the second step, a higher running time and a higher number of starting points can be used to better explore the objective function on the resulting smaller interval *[L, R]*.
 
 
 ### Main tools
@@ -215,7 +254,7 @@ This is the main tool that implements the coordinate-descent algorithm for solvi
             -f
               Do not fix root to all 2s
             -j int
-               Number of workers (default: 2). Each worker solves a starting point independently and in parallel to the other workers. Each worker uses a number of threads specified by the following parameter '-nt' 
+               Number of workers (default: 2). Each worker solves a starting point independently and in parallel to the other workers. Each worker uses a number of threads specified by the following parameter '-nt'
             -k int
                Number of leaves, corresponding to the extant clones that we are inferring
             -lbZ int
@@ -284,7 +323,7 @@ For each starting point, the coordinate-descent algorithm yields a sequence of p
 
 ### Workers
 
-For a given value of maximum cost Lambda_max, our method applies the coordinate-descent algorithm described in the reference pubblication by using different starting points. We can consider and execute each starting point independently. 
+For a given value of maximum cost Lambda_max, our method applies the coordinate-descent algorithm described in the reference pubblication by using different starting points. We can consider and execute each starting point independently.
 As such, we exploit the parallel structure of our method by executing multiple starting points in parallel, when possible. A worker is the basic computational unit that executes the algorithm starting from a single starting point. Therefore, the the total number of workers determine the number of starting points that are executed on parallel. When a worker concludes a job, it executes the algorithm considering the next available (if there is) starting point. The execution of the method ends when the workers executed all the starting points.
 
 ### Searching scheme for the best value of Lambda_max
@@ -295,4 +334,4 @@ Here, we describe the alternative search schemes that can be used by our method 
 
 2. Linear search from L to R . The running time of this search scheme is linear in the size of the interval and it is ideal when considering small intervals. In fact, the best solution found with a specific value Lambda_t of the maximum cost of Lambda_max can be used as a starting solution for computing the solution with Lambda_{t+1}.
 
-3. Reverse Linear search from R to L . The running time of this search scheme is linear in the size of the interval. This method can be very fast when the best value of Lambda_max is close to the rightmost bound R. This method is therefore 
+3. Reverse Linear search from R to L . The running time of this search scheme is linear in the size of the interval. This method can be very fast when the best value of Lambda_max is close to the rightmost bound R. This method is therefore
