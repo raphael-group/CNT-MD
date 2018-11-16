@@ -68,6 +68,24 @@ The compilation results in the following executables in the `build` directory:
 
 ## <a name="usage"></a>Usage instructions
 
+### Input format
+
+Example:
+
+	#PARAMS
+	2 #number of chromosomes
+	4 #number of samples
+	6 6 #number of segments for each chromosome
+	#SAMPLES
+	1 : 2.14 1.43 1.43 3.71 2.0 2.0 | 3.29 3.29 4.0 2.0 2.0 1.29
+	2 : 1.0 2.0 2.0 1.0 2.0 2.0 | 1.0 0.0 0.0 1.0 2.0 2.0
+	3 : 2.9 2.0 2.0 3.85 2.0 2.0 | 2.9 2.85 3.8 1.95 2.0 1.05
+	4 : 1.55 1.99 1.99 1.83 2.0 2.0 | 1.56 0.84 1.11 1.28 2.0 1.72
+
+The first line must be `#PARAMS`. The three subsequent lines indicate the number of chromosomes, the number of samples and the number of segments for each chromosome (separated by a space character). The fourth line must be `#SAMPLES`. Next, for each sample the fractional copy numbers are given, such that the fractions of segments on the same chromosome are separated by spaces, whereas the chromosomes are separated by '|'.
+*IMPORTANT:* Each sample must contain the same set of segments per chromosome. Therefore if the fractional copy numbers have been called independently for each sample, a procedure is needed to ensure this.
+
+
 ### Generate input from log2ratios
 
 We provide a command able to compute the fractional copy numbers of multiple samples and generate the corresponding input from standard log2ratios.
@@ -105,23 +123,6 @@ The following is an example of execution using the given example of data:
 
     python2 make_input.py ../data/test/log2ratios.tsv -c 2 -b 30 -m 8 -u 0.3 > input.samples
 
-
-### Input format
-
-Example:
-
-	#PARAMS
-	2 #number of chromosomes
-	4 #number of samples
-	6 6 #number of segments for each chromosome
-	#SAMPLES
-	1 : 2.14 1.43 1.43 3.71 2.0 2.0 | 3.29 3.29 4.0 2.0 2.0 1.29
-	2 : 1.0 2.0 2.0 1.0 2.0 2.0 | 1.0 0.0 0.0 1.0 2.0 2.0
-	3 : 2.9 2.0 2.0 3.85 2.0 2.0 | 2.9 2.85 3.8 1.95 2.0 1.05
-	4 : 1.55 1.99 1.99 1.83 2.0 2.0 | 1.56 0.84 1.11 1.28 2.0 1.72
-
-The first line must be `#PARAMS`. The three subsequent lines indicate the number of chromosomes, the number of samples and the number of segments for each chromosome (separated by a space character). The fourth line must be `#SAMPLES`. Next, for each sample the fractional copy numbers are given, such that the fractions of segments on the same chromosome are separated by spaces, whereas the chromosomes are separated by '|'.
-*IMPORTANT:* Each sample must contain the same set of segments per chromosome. Therefore if the fractional copy numbers have been called independently for each sample, a procedure is needed to ensure this.
 
 ### Output format
 

@@ -319,7 +319,19 @@ void Manager::runInstance(const int Z, const int seedIdx, const HotStart &inputC
                   _timeLimit, _memoryLimit, _nrILPthreads,
                   _allM0[seedIdx], seedIdx,
                   inputCompleteHotStart);
-    double objValue = worker.solve();
+
+    double objValue = 0;
+    try{
+      objValue = worker.solve();
+    } catch (const std::exception& ex) {
+      std::cerr << ex.what() << std::endl;
+      std::exit(EXIT_FAILURE);
+    } catch (const std::string& ex) {
+      std::cerr << ex << std::endl;
+      std::exit(EXIT_FAILURE);
+    } catch (...) {
+      std::exit(EXIT_FAILURE);
+    }
 
     {
         boost::interprocess::scoped_lock<boost::mutex> lock(_mutex);
