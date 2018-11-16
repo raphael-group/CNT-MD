@@ -78,6 +78,7 @@ set( CommonLibs
   concert
   pthread
   emon
+  dl
 )
 
 add_executable ( mixcnp
