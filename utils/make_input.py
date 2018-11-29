@@ -155,7 +155,7 @@ def write_input(frac):
     print '{} #number of chromosomes'.format(len(set(c for s in frac for c in frac[s])))
     print '{} #number of samples'.format(len(frac.keys()))
     tg = frac.keys()[0]
-    print '{} #number of segments for each chromosome'.format(' '.join([str(len(frac[tg][c])) for c in frac[tg]]))
+    print '{} #number of segments for each chromosome'.format(' '.join([str(len(frac[tg][c])) for c in sorted(frac[tg], key=order)]))
     print '#SAMPLES',
     lbe = (lambda c : ' '.join(['{},{}'.format(e[0], e[1]) for e in sorted(frac[tg][c], key=(lambda x : x[0]))]))
     print ' | '.join(['{} : {}'.format(c, lbe(c)) for c in sorted(frac[tg], key=order)])
