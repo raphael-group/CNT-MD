@@ -18,6 +18,7 @@
 
 int main(int argc, char** argv)
 {
+    try{
     int timeLimit = -1;
     int memoryLimit = -1;
     const int size_bubbles = 10;
@@ -133,4 +134,11 @@ int main(int argc, char** argv)
     }
 
     return 0;
+    } catch (const std::exception& ex) {
+        std::cerr << ex.what() << std::endl;
+    } catch (const std::string& ex) {
+        std::cerr << ex << std::endl;
+    } catch (...) {
+        std::cerr << ">> UNCAUGHT ERROR!" << std::endl;
+    }
 }
