@@ -138,6 +138,8 @@ int main(int argc, char** argv)
         std::cerr << ex.what() << std::endl;
     } catch (const std::string& ex) {
         std::cerr << ex << std::endl;
+    } catch (IloException& ex) {
+        std::cerr << ex << std::endl;
     } catch (...) {
         std::cerr << ">> UNCAUGHT ERROR!" << std::endl;
     }
